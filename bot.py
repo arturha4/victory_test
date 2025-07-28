@@ -1,13 +1,14 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types, Router
 from aiogram.filters import Command
+from db import PgAsyncConn
 
 API_TOKEN = '8481581028:AAFWhYT_nTmdeHfZM4Svw8fKCTwbficsloA'
 
 # Создаем объекты бота и диспетчера
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
-
+pg_conn = PgAsyncConn()
 router = Router()
 dp.include_router(router)
 
@@ -27,6 +28,7 @@ async def cmd_start(message: types.Message):
     user_id = message.from_user.id
     if user_id not in users:
         users[user_id] = DEFAULT_ROLE
+    await pg_conn.query()
     await message.answer("Привет! Вы используете бота.")
 
 @router.message(Command(commands=["stats"]))
@@ -92,7 +94,7 @@ async def cmd_mailings(message: types.Message):
     await message.answer(msg)
 
 async def main():
-    # Запускаем поллинг
+    await pg_conn.init_db_pool()
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
