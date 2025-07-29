@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
-from db import connection
-from models import (
+from database.db import connection
+from database.models import (
     User,
     Role, Task, TaskStatus
 )
