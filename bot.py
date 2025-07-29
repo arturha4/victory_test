@@ -23,7 +23,11 @@ async def cmd_start(message: types.Message):
             await create_user(telegram_id, Role.admin)
         else:
             await create_user(telegram_id, Role.user)
-        await message.answer(f"Привет {message.from_user.username}! Теперь, вы используете бота.")
+        await message.answer(f"Привет {message.from_user.username}! Теперь, вы используете бота.\n"
+                             f"Команды бота: \n"
+                             f"/stats - получить статистику по пользователям и рассылкам.\n"
+                             f"/setrole <Telegram ID> <user, manager или admin> - изменить роль пользователя\n"
+                             f"/broadcast <Текст рассылки>")
     else:
         await message.answer(f"Привет {message.from_user.username}!")
 
@@ -72,7 +76,7 @@ async def cmd_setrole(message: types.Message):
 async def cmd_broadcast(message: types.Message):
     telegram_id = str(message.from_user.id)
     user = await get_user(telegram_id)
-    if not user or user.role not in [Role.manager, Role.admin]:
+    if not user or user.role != Role.manager:
         await message.answer("Доступ запрещён. Команда только для менеджера.")
         return
     text = message.text.replace('/broadcast', '').strip()
