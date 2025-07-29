@@ -2,6 +2,13 @@
 
 Тестовое VictoryGroup
 
+## Технологии
+* AsyncPG
+* aiogram
+* SQLAlchemy
+* Docker
+
+
 ## Требования
 
 - Установленный Docker (https://docs.docker.com/get-docker/)
@@ -36,9 +43,6 @@
 - requirements.txt — зависимости Python-проекта
 
 ## Переменные окружения (.env)
-
-Опишите основные переменные, например:
-
 POSTGRES_USER=postgres\
 POSTGRES_PASSWORD=postgres\
 POSTGRES_DB=postgres\
@@ -51,8 +55,7 @@ TELEGRAM_BOT_ADMIN_ID=Telegram id админа
 
 - PostgreSQL запускается как отдельный контейнер.
 - Приложение (бот) зависит от базы данных и запускается после её готовности.
-- Перед стартом бота происходит автоматическое применение миграций через Alembic.
-- Используется скрипт ожидания готовности базы (wait_for_db.sh или entrypoint.sh).
+- Перед стартом бота запускаете процесс миграций через Alembic.
 
 ## Полезные команды
 
