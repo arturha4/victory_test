@@ -1,12 +1,11 @@
 import asyncio
-from gc import get_freeze_count
 
 from aiogram import Bot, Dispatcher, types, Router
 from aiogram.filters import Command
 
 from config import settings
-from models import Role, TaskStatus
-from services import create_user, get_user, get_count_of_users, patch_user, get_users, get_count_of_tasks, create_task, \
+from database.models import Role, TaskStatus
+from database.services import create_user, get_user, get_count_of_users, patch_user, get_users, get_count_of_tasks, create_task, \
     change_task_status
 
 bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
@@ -19,9 +18,11 @@ dp.include_router(router)
 async def cmd_start(message: types.Message):
     telegram_id = str(message.from_user.id)
     user = await get_user(telegram_id)
-    print(user.__dict__)
     if not user:
-        user = await create_user(user)
+        if settings.TELEGRAM_BOT_ADMIN_ID == str(message.from_user.id):
+            await create_user(telegram_id, Role.admin)
+        else:
+            await create_user(telegram_id, Role.user)
         await message.answer(f"Привет {message.from_user.username}! Теперь, вы используете бота.")
     else:
         await message.answer(f"Привет {message.from_user.username}!")
@@ -91,7 +92,6 @@ async def cmd_broadcast(message: types.Message):
 
 
 async def main():
-    # await create_user('12312312', Role.user)
     await dp.start_polling(bot)
 
 
