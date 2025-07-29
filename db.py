@@ -1,40 +1,22 @@
-import asyncpg
+from config import settings
 
-from asyncpg.pool import Pool
-
-from config import (
-    PG_USER,
-    PG_PASSWORD,
-    PG_DB,
-    PG_HOST,
-    PG_PORT
+from sqlalchemy.ext.asyncio import (
+    async_sessionmaker,
+    create_async_engine
 )
 
-class PgAsyncConn:
-     def __init__(self):
-        self._pool = None
+DATABASE_URL = settings.get_db_url()
+engine = create_async_engine(url=DATABASE_URL)
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
-     async def init_db_pool(self):
-        if self._pool is None:
-            self._pool = await asyncpg.create_pool(
-                 user=PG_USER,
-                 password=PG_PASSWORD,
-                 database=PG_DB,
-                 host=PG_HOST,
-                 port=PG_PORT
-            )
-
-     async def close_db_pool(self):
-         if self._pool:
-             await self._pool.close()
-             _pool = None
-
-     async def get_db_pool(self) -> Pool:
-         if self._pool is None:
-             raise Exception("Pool is not initialized, call init_db_pool first")
-         return self._pool
-
-     async def query(self):
-        async with self._pool.acquire() as conn:
-            version = await conn.fetchval('SELECT version()')
-            print(f"Подключено к: {version}")
+def connection(method):
+    async def wrapper(*args, **kwargs):
+        async with async_session_maker() as session:
+            try:
+                return await method(*args, session=session, **kwargs)
+            except Exception as e:
+                await session.rollback()
+                raise e
+            finally:
+                await session.close()
+    return wrapper
