@@ -1,4 +1,5 @@
-from config import settings
+import sys
+from ..config import settings
 
 from sqlalchemy.ext.asyncio import (
     async_sessionmaker,

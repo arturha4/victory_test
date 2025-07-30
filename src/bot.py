@@ -3,10 +3,17 @@ import asyncio
 from aiogram import Bot, Dispatcher, types, Router
 from aiogram.filters import Command
 
-from config import settings
-from database.models import Role, TaskStatus
-from database.services import create_user, get_user, get_count_of_users, patch_user, get_users, get_count_of_tasks, create_task, \
-    change_task_status
+from src.config import settings
+from src.database.models import Role, TaskStatus
+from src.database.services import (
+    create_user,
+    get_user,
+    get_count_of_users,
+    patch_user,
+    get_users,
+    get_count_of_tasks,
+    create_task,
+    change_task_status)
 
 bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
 dp = Dispatcher()
