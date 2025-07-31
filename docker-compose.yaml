@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   db:
+    container_name: postgres-database
     image: postgres:14.1-alpine
     restart: always
     environment:
@@ -10,8 +11,16 @@ services:
       - '5432:5432'
     volumes:
       - db:/var/lib/postgresql/data
-    app:
-      image: python
+  app:
+    container_name: bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python -m src.bot
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
 volumes:
   db:
     driver: local

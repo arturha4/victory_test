@@ -1,4 +1,3 @@
-import sys
 from ..config import settings
 
 from sqlalchemy.ext.asyncio import (

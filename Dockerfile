@@ -1,9 +1,13 @@
 FROM python:3.11-slim
 
-COPY ../requirements.txt .
+WORKDIR /app
+
+COPY requirements.txt /app
 
 RUN pip install -r requirements.txt
 
-COPY ../ .
+COPY . /app
 
-CMD ['python', '-m', 'src/bot.py']
+RUN chmod +x ./alembic-entrypoint.sh
+
+ENTRYPOINT ["./alembic-entrypoint.sh"]
