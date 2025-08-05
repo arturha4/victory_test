@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram import Bot, Dispatcher, types, Router
 from aiogram.filters import Command
-
+from src.tasks import periodic
 from src.config import settings
 from src.database.models import Role, TaskStatus
 from src.database.services import (
@@ -24,6 +24,7 @@ dp.include_router(router)
 @router.message(Command(commands=["start"]))
 async def cmd_start(message: types.Message):
     telegram_id = str(message.from_user.id)
+    periodic.send_telegram_message.delay(message.from_user.id, 'niger')
     user = await get_user(telegram_id)
     if not user:
         if settings.TELEGRAM_BOT_ADMIN_ID == str(message.from_user.id):
@@ -37,7 +38,6 @@ async def cmd_start(message: types.Message):
                              f"/broadcast <Текст рассылки>")
     else:
         await message.answer(f"Привет {message.from_user.username}!")
-
 
 @router.message(Command(commands=["stats"]))
 async def cmd_stats(message: types.Message):

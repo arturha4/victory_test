@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import Integer, func, String, text, ForeignKey
+from sqlalchemy import Integer, String, DateTime, func, text, ForeignKey
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, declared_attr
 
@@ -41,6 +41,7 @@ class User(Base):
 
 class Task(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    start_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     creator_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     status: Mapped[TaskStatus] = mapped_column(
         default=TaskStatus.pending,
