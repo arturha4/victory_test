@@ -1,7 +1,5 @@
-# VictoryTest
-
-Тестовое VictoryGroup
-
+# VictoryBot
+Бот для рассылки сообщений для подписанных пользоватедей
 ## Технологии
 * AsyncPG
 * aiogram
