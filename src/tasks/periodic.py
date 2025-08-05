@@ -1,31 +1,22 @@
 import asyncio
-
 from celery import Celery
 
-from ..bot import bot
+from ..bot import settings, bot
 
 app = Celery('tasks',
-             broker='redis://broker:6379/0',
-             backend='redis://broker:6379/0')
+             broker=settings.BROKER_URL,
+             backend=settings.BROKER_URL)
 
 
-# @app.task(name='tasks.add')
-# def create_celery_task_send_message(text: str, chat_id: str) -> None:
-#     """Таска для отправки напоминания о задаче"""
-#     asyncio.run(send_notification_message(text, chat_id))
-#
-#
-# async def send_notification_message(text: str, chat_id: str) -> None:
-#     """Отправляем напоминалку"""
-#     message = text
-#     await bot.send_message(chat_id=chat_id, text=message)
+@app.on_after_configure.connect
+def setup_periodic_tasks(sender: Celery, **kwargs):
+    sender.add_periodic_task(10.0, send_telegram_message.s(766109265, 'hello'), name='add every 10')
 
 
 def send_message_sync(chat_id: int, text: str):
     async def main():
-        await bot.send_message(chat_id, text)
+        await bot.send_message(settings.TELEGRAM_BOT_ADMIN_ID, text)
         await bot.session.close()
-
     asyncio.run(main())
 
 

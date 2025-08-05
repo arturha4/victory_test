@@ -27,7 +27,7 @@ services:
     restart: always
     ports:
       - '6379:6379'
-  tasks:
+  tasks_worker:
     container_name: celery_tasks
     build:
       context: .
@@ -36,6 +36,16 @@ services:
       - broker
       - app
     command: celery -A src.tasks.periodic worker --loglevel=info
+  tasks_beat:
+    container_name: celery_beat
+    build:
+      context: .
+      dockerfile: src/tasks/Dockerfile.celery
+    command: celery -A src.tasks.periodic beat --loglevel=info
+    depends_on:
+      - broker
+      - app
+      - tasks_worker
 volumes:
   db:
-    driver: local
+    driver: locals
