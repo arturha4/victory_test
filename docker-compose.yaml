@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   db:
-    container_name: postgres-database
+    container_name: database
     image: postgres:14.1-alpine
     restart: always
     environment:
@@ -21,6 +21,31 @@ services:
       - ./:/app
     depends_on:
       - db
+  broker:
+    container_name: redis-server
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+  tasks_worker:
+    container_name: celery_tasks
+    build:
+      context: .
+      dockerfile: src/tasks/Dockerfile.celery
+    depends_on:
+      - broker
+      - app
+    command: celery -A src.tasks.periodic worker --loglevel=info
+  tasks_beat:
+    container_name: celery_beat
+    build:
+      context: .
+      dockerfile: src/tasks/Dockerfile.celery
+    command: celery -A src.tasks.periodic beat --loglevel=info
+    depends_on:
+      - broker
+      - app
+      - tasks_worker
 volumes:
   db:
-    driver: local
+    driver: locals
